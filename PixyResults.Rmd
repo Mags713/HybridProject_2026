@@ -1,0 +1,596 @@
+---
+title: "CleanedPixyResults"
+author: "Magie Williams"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+I just wanted to clean up the results from pixy, since my other Rmarkdown is kind of just copy and paste different parts of code from me and copilot. I did use copilot to help with some of the cleaning and condensing. 
+
+I did initially mess this up so I am updating as I go but this is the documentation notes from pixy:
+"If you want to combine information across windows after the fact (e.g. by averaging), do not simply average the per-window summary statistics. Instead, sum the raw counts or components and recompute the statistic."
+
+Before doing anything, I want to make sure everything is consistent between my Rmarkdowns so I am going to define labels and colors now then will get into the workflow. This is mostly for ease of coding late as well. 
+
+Colorblind Friendly Colors from AudioEye: Black (#000000)
+
+Orange (#E69F00) #FE6100
+Sky Blue (#56B4E9)
+Bluish Green (#009E73)
+Yellow (#F0E442)
+Blue (#0072B2)
+Vermillion (#D55E00)
+Reddish Purple (#CC79A7)
+
+```{r}
+pop_colors <- c(
+  "Port Sheldon" = "#FE6100",
+  "Rosy Mound" = "#FFB000",
+  "Seven Bridges" = "#0057B8",
+  "Springvale" = "#DC267F",
+  "Tatum" = "#785EF0"
+)
+
+pop_labels <- c(
+  "Port Sheldon" = "Port Sheldon",
+  "Rosy Mound" = "Rosy Mound",
+  "Seven Bridges" = "Seven Bridges",
+  "Springvale" = "Springvale",
+  "Tatum" = "Tatum"
+)
+
+sub_labels <- c("N" = "B. laevigata",
+                "S" = "B. stricta")
+
+sub_colors <- c( "N" = "")
+
+```
+
+
+```{r Package_Data, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(broom)
+library(ggplot2)
+#Read in pi file
+pi <- read.delim("all_pops_pi.txt")
+#adjust it to be usable
+pi <- pi %>%
+  mutate(
+    chr_group = gsub("S$", "", chromosome),
+    subgenome = ifelse(grepl("S$", chromosome), "S", "N")
+  )
+
+ggplot(pi, aes(x =avg_pi)) + 
+  geom_histogram() 
+#not weighted
+ggplot(pi, aes(x = pop, y =avg_pi, fill = subgenome)) + 
+  geom_boxplot() +
+  ylab(expression(pi[Average] ("Not Weighted"))) +
+  xlab("Population")
+#whole genome investigation
+#avg_pi -> this is not weighted
+#amount of instancs where avg pi is zerp
+sum(pi$avg_pi == 0, na.rm = TRUE)
+#those grouped by population
+ZeroPop <- pi %>%
+  group_by(pop) %>%
+  summarize(n_zero = sum(avg_pi == 0, na.rm = TRUE))
+#grouped by chromosome
+ZeroChr <- pi %>%
+  group_by(chromosome) %>%
+  summarize(n_zero = sum(avg_pi == 0, na.rm = TRUE))
+
+mean(pi$avg_pi == 0, na.rm = TRUE)
+
+sum(pi$avg_pi == 0, na.rm = TRUE) /
+sum(!is.na(pi$avg_pi))
+
+summary(pi$no_sites)
+#positions with no sites
+NoSites <- pi %>%
+  filter(avg_pi == 0) %>%
+  summarize(
+    mean_sites = mean(no_sites, na.rm = TRUE),
+    median_sites = median(no_sites, na.rm = TRUE)
+  )
+#self explanatory
+CountCompare <- pi %>%
+  filter(avg_pi == 0) %>%
+  summarize(
+    mean_comp = mean(count_comparisons, na.rm = TRUE),
+    median_comp = median(count_comparisons, na.rm = TRUE)
+  )
+#also self explanatory
+ZeroVsNonZero <- pi %>%
+  summarize(
+    total = n(),
+    zero_pi = sum(avg_pi == 0, na.rm = TRUE),
+    nonzero_pi = sum(avg_pi > 0, na.rm = TRUE),
+    no_data = sum(is.na(avg_pi))
+  )
+
+#proportion_zero
+PropZeroPop <- pi %>%
+  group_by(pop) %>%
+  summarize(
+    prop_zero = mean(avg_pi == 0, na.rm = TRUE)
+  )
+#not weighted
+NoZero <- pi %>%
+  filter(avg_pi != "0")
+
+range(NoZero$avg_pi)
+
+ggplot(NoZero, aes(x =avg_pi)) + 
+  geom_histogram() +
+  labs(title = "Zeroes Removed")
+
+ggplot(NoZero, aes(x = pop, y =avg_pi, fill = subgenome)) + 
+  geom_boxplot() +
+  ylab(expression(pi[Average] ("Not Weighted"))) +
+  xlab("Population") +
+  labs(title = "Zeroes Removed")
+```
+Okay so breaking down all the Pi Info:
+Here is the number of observations where the avg_pi by window is zero
+
+```{r, echo=FALSE} 
+ZeroPop 
+```
+
+Now by chromosome instead
+
+```{r, echo=FALSE}
+ZeroChr
+```
+
+mean number of window positions with no site differences: `r NoSites$mean_sites`
+
+Breakdown of site distributions
+
+```{r, echo=FALSE}
+ZeroVsNonZero
+```
+That was the end of everything I could get for trouble shooting why there are so many zeros.
+
+Since weighted is needed going to go ahead and do that
+```{r Adding Weight, message=FALSE, warning=FALSE}
+#weighting it out
+weighted_pi <- pi %>%
+  group_by(pop, chr_group, subgenome) %>%
+  summarize(
+    weighted_pi =
+      sum(count_diffs, na.rm = TRUE) /
+      sum(count_comparisons, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+Pat's paper and I think the cotton paper both used the mean and CI plots. I think the only way to do this with the weighted thing is to make confidence intervals. If there is a better way I would rather do that. I couldn't remember which lab in 830 we did them. But I would happily adjust the code to that from 830 or 831.
+
+```{r BootstrapFx, message=FALSE, warning=FALSE}
+boot_pi <- function(df){
+  sampled <- df[sample(nrow(df), replace = TRUE), ]
+  comps <- sum(sampled$count_comparisons, na.rm = TRUE)
+  if(comps == 0) return(NA)
+  sum(sampled$count_diffs, na.rm = TRUE) / comps
+}
+```
+
+
+```{r FunctionTest, message=FALSE, warning=FALSE, echo=FALSE}
+#testing
+chr1 <- pi %>%
+  filter(chr_group == "chr1")
+boot_N <- replicate(
+  1000,
+  boot_pi(filter(chr1, subgenome == "N"))
+)
+boot_S <- replicate(
+  1000,
+  boot_pi(filter(chr1, subgenome == "S"))
+)
+boot_diff <- boot_N - boot_S
+quantile(
+  boot_diff,
+  c(0.025, 0.975)
+)
+```
+
+So now that I think the function is working properly. If I even needed to make one in the first place. 
+
+```{r WeightedPi, message=TRUE, warning=TRUE}
+#officially making the confidence intrevals
+#weighted
+weighted_pi_ci <- pi %>%
+  group_by(pop, chr_group, subgenome) %>%
+  group_modify(~{
+    boots <- replicate(
+      1000,
+      boot_pi(.x)
+    )
+    tibble(
+      weighted_pi =
+        sum(.x$count_diffs, na.rm = TRUE) /
+        sum(.x$count_comparisons, na.rm = TRUE),
+      lower = quantile(boots, 0.025, na.rm = TRUE),
+      upper = quantile(boots, 0.975, na.rm = TRUE)
+    )
+  })
+```
+
+``` {r} 
+#checking with the plot
+#the overall one
+ggplot(
+  weighted_pi_ci,
+  aes(
+    chr_group,
+    weighted_pi,
+    color = pop,
+    shape = subgenome
+  )
+) +
+  geom_point(
+    position = position_dodge(width = 0.5),
+    size = 3
+  ) +
+  geom_errorbar(
+    aes(
+      ymin = lower,
+      ymax = upper
+    ),
+    position = position_dodge(width = 0.5),
+    width = 0.2
+  ) +
+  theme_bw() +
+  ylab(expression(pi[weighted])) +
+  xlab("Chromosome")
+#New Colors and Labels
+FinalSumPlot <- ggplot(
+  weighted_pi_ci,
+  aes(
+    chr_group,
+    weighted_pi,
+    color = pop,
+    shape = subgenome
+  )
+) +
+  geom_point(
+    position = position_dodge(width = 0.5),
+    size = 3
+  ) +
+  geom_errorbar(
+    aes(
+      ymin = lower,
+      ymax = upper
+    ),
+    position = position_dodge(width = 0.5),
+    width = 0.2
+  ) +
+  scale_color_manual(
+    values = pop_colors,
+    labels = pop_labels,
+    name = "Population"
+  ) +
+  theme_bw() +
+  ylab(expression(pi[weighted])) +
+  xlab("Chromosome")
+
+print(FinalSumPlot)
+
+#more of a remake of the first plot
+ggplot(weighted_pi_ci, aes(pop,
+    weighted_pi,
+    color = subgenome)) +
+  geom_boxplot() +
+  ylab(expression(pi[weighted])) +
+  xlab("Population") +
+  theme_bw() +
+  
+#trying something funky
+ggplot(weighted_pi_ci, aes(pop,
+    weighted_pi,
+    color = chr_group,
+    shape = subgenome)) +
+    geom_point(
+    position = position_dodge(width = 0.5),
+    size = 3
+  ) +
+  geom_errorbar(
+    aes(
+      ymin = lower,
+      ymax = upper
+    ),
+    position = position_dodge(width = 0.5),
+    width = 0.2
+  ) +
+  ylab(expression(pi[weighted])) +
+  xlab("Population") +
+  theme_bw()
+```
+
+Pat's paper used the wilcox test
+So going to do pairwise between the subgenomes for chromosomes and populations
+
+```{r Wilcox Subgenome}
+wilcox.test(weighted_pi$weighted_pi ~ weighted_pi$subgenome)
+wilcox.test(pi$avg_pi ~ pi$subgenome)
+#running more than one at a time
+#weighted
+weighted_subgenome_wilcox <- weighted_pi %>%
+  filter(!is.na(weighted_pi)) %>%
+  group_by(chr_group) %>%
+  group_modify(~{
+    test <- wilcox.test(
+      weighted_pi ~ subgenome,
+      data = .x,
+      conf.int = TRUE
+    )
+    broom::tidy(test)
+  })
+weighted_subgenome_wilcox
+#weighted but sub x population
+weighted_subpop_wilcox <- weighted_pi %>%
+  filter(!is.na(weighted_pi)) %>%
+  group_by(pop) %>%
+  group_modify(~{
+    test <- wilcox.test(
+      weighted_pi ~ subgenome,
+      data = .x,
+      conf.int = TRUE
+    )
+    broom::tidy(test)
+  })
+weighted_subpop_wilcox
+#sub x pop x chr doesn't have enough when weighted to run this
+```
+
+Getting a better visualization of the subgenome differences. 
+```{r}
+sub_diff <- pi %>%
+  group_by(pop, chr_group, subgenome) %>%
+  summarize(
+    weighted_pi =
+      sum(count_diffs, na.rm = TRUE) /
+      sum(count_comparisons, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  pivot_wider(
+    names_from = subgenome,
+    values_from = weighted_pi
+  ) %>%
+  mutate(
+    diff = N - S
+  )
+
+sub_diff %>%
+  arrange(desc(abs(diff)))
+
+sub_diff_boot <- pi %>%
+  group_by(pop, chr_group) %>%
+  group_modify(~{
+    N_dat <- filter(.x, subgenome == "N")
+    S_dat <- filter(.x, subgenome == "S")
+    diffs <- replicate(1000, {
+      boot_pi(N_dat) - boot_pi(S_dat)
+    })
+    tibble(
+      lower = quantile(diffs, 0.025, na.rm = TRUE),
+      upper = quantile(diffs, 0.975, na.rm = TRUE)
+    )
+  })
+
+sub_diff <- sub_diff %>%
+  left_join(sub_diff_boot,
+            by = c("pop", "chr_group"))
+
+ggplot(sub_diff,
+       aes(chr_group, diff,
+           color = pop,
+           group = pop)) +
+  geom_hline(yintercept = 0,
+             linetype = 2) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(ymin = lower,
+        ymax = upper),
+    width = 0.15
+  ) +
+  theme_bw() +
+  ylab(expression(pi[B.laevigata] - pi[B.stricta])) +
+  xlab("Chromosome")
+
+ggplot(sub_diff, aes(pop,
+    diff,
+    color = chr_group)) +
+    geom_point(
+    position = position_dodge(width = 0.5),
+    size = 3
+  ) +
+  geom_errorbar(
+    aes(
+      ymin = lower,
+      ymax = upper
+    ),
+    position = position_dodge(width = 0.5),
+    width = 0.2
+  ) +
+  ylab(expression(pi[B.laevigata] - pi[B.stricta])) +
+  xlab("Population") +
+  theme_bw()
+```
+Now time for populations. Since there are five I either need to do something else or do wilcox for each pair. 
+
+```{r Pairwise Pops, message=FALSE, warning=TRUE}
+#lets see if this works
+#weighted
+pairwise.wilcox.test(
+  weighted_pi$weighted_pi,
+  weighted_pi$pop,
+  p.adjust.method = "BH"
+)
+#not weighted
+pairwise.wilcox.test(
+  pi$avg_pi,
+  pi$pop,
+  p.adjust.method = "BH"
+)
+#no zeros
+NoZ <- pi %>%
+  filter(avg_pi != "0")
+pairwise.wilcox.test(
+  NoZ$avg_pi,
+  NoZ$pop,
+  p.adjust.method = "BH"
+)
+
+```
+
+Looking into population relationships with everything else
+```{r}
+#weighted
+PopChr_wilcox <- weighted_pi %>%
+  group_by(chr_group) %>%
+  group_modify(~{
+    test <- pairwise.wilcox.test(weighted_pi$weighted_pi,
+                        weighted_pi$pop, 
+                        p.adjust.method = "BH"
+                        )
+    broom::tidy(test)
+  })
+PopChr_wilcox
+
+PopSub_wilcox <- weighted_pi %>%
+  group_by(subgenome) %>%
+  group_modify(~{
+    test <- pairwise.wilcox.test(weighted_pi$weighted_pi,
+                        weighted_pi$pop, 
+                        p.adjust.method = "BH"
+                        )
+    broom::tidy(test)
+  })
+PopSub_wilcox
+
+PopSubChr_wilcox <- weighted_pi %>%
+  group_by(subgenome, chr_group) %>%
+  group_modify(~{
+    test <- pairwise.wilcox.test(weighted_pi$weighted_pi,
+                        weighted_pi$pop, 
+                        p.adjust.method = "BH"
+                        )
+    broom::tidy(test)
+  })
+PopSubChr_wilcox
+```
+
+not weighted T-test from mess up
+
+```{r}
+pairwise_pop <- pi %>%
+  filter(!is.na(avg_pi)) %>%
+  group_by(chr_group) %>%
+  group_modify(~{
+
+    pw <- pairwise.t.test(
+      .x$avg_pi,
+      .x$pop,
+      p.adjust.method = "BH"
+    )
+
+    as.data.frame(as.table(pw$p.value))
+
+  })
+
+pop_means <- pi %>%
+  group_by(pop, chr_group) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    n_windows = sum(!is.na(avg_pi)),
+    .groups = "drop"
+  )
+
+```
+
+```{r}
+pi %>%
+  group_by(pop) %>%
+  summarize(
+    n_windows = n(),
+    n_na = sum(is.na(avg_pi)),
+    prop_na = mean(is.na(avg_pi))
+  )
+
+pi %>%
+  group_by(pop, chromosome) %>%
+  summarize(
+    prop_na = mean(is.na(avg_pi)),
+    .groups = "drop"
+  )
+```
+
+I did like the heat map from before so gonna try that again
+
+```{r}
+#weighted
+df <- as.data.frame(weighted_pi)
+
+heat_df <- expand_grid(
+  pop1 = df$pop,
+  pop2 = df$pop
+) %>%
+  left_join(
+    df[, c("pop", "weighted_pi")],
+    by = c("pop1" = "pop")
+  ) %>%
+  rename(pi1 = weighted_pi) %>%
+  left_join(
+    df[, c("pop", "weighted_pi")],
+    by = c("pop2" = "pop")
+  ) %>%
+  rename(pi2 = weighted_pi) %>%
+  mutate(diff = pi1 - pi2)
+
+ggplot(heat_df,
+       aes(x = pop1,
+           y = pop2,
+           fill = diff)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme_bw()
+
+```
+
+something is weird witht the heat map assuming I did not do it correctly at this point. 
+
+Population and Chromosomes - not weighted
+
+```{r}
+pi_sum <- pi %>%
+  group_by(pop, chr_group) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    sd = sd(avg_pi, na.rm = TRUE),
+    n = sum(!is.na(avg_pi)),
+    se = sd/sqrt(n),
+    lower = mean_pi - 1.96 * se,
+    upper = mean_pi + 1.96 * se,
+    .groups = "drop"
+  )
+
+ggplot(
+  pi_sum,
+  aes(chr_group,
+      mean_pi,
+      color = pop,
+      group = pop)
+) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(ymin = lower,
+        ymax = upper),
+    width = .15
+  ) +
+  theme_bw()
+```
+

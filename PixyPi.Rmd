@@ -1,0 +1,229 @@
+---
+title: "PixyPi"
+author: "Magie Williams"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+pi <- read.delim("all_pops_pi.txt")
+
+head(pi)
+str(pi)
+```
+
+```{r}
+pop_summary <- pi %>%
+  group_by(pop) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    median_pi = median(avg_pi, na.rm = TRUE),
+    sd_pi = sd(avg_pi, na.rm = TRUE),
+    n_windows = n()
+  )
+
+pop_summary
+```
+
+```{r}
+chr_summary <- pi %>%
+  group_by(chromosome) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    median_pi = median(avg_pi, na.rm = TRUE),
+    sd_pi = sd(avg_pi, na.rm = TRUE),
+    n_windows = n()
+  )
+
+chr_summary
+```
+
+```{r}
+pop_chr_summary <- pi %>%
+  group_by(pop, chromosome) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    sd_pi = sd(avg_pi, na.rm = TRUE),
+    n_windows = n(),
+    .groups = "drop"
+  )
+
+```
+
+```{r}
+ggplot(pi, aes(pop, avg_pi, fill = pop)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(pi, aes(chromosome, avg_pi)) +
+  geom_boxplot() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(pi,
+       aes(x = window_pos_1,
+           y = avg_pi,
+           color = pop)) +
+  geom_point(size = 0.4) +
+  facet_wrap(~chromosome, scales = "free_x") +
+  theme_bw()
+
+
+```
+
+N is laevigata
+
+```{r}
+pi <- pi %>%
+  mutate(
+    subgenome = ifelse(grepl("S$", chromosome),
+                       "S",
+                       "N")
+  )
+
+sub_summary <- pi %>%
+  group_by(pop, subgenome) %>%
+  summarize(
+    mean_pi = mean(avg_pi, na.rm = TRUE),
+    sd_pi = sd(avg_pi, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(pi,
+       aes(subgenome, avg_pi, fill = pop)) +
+  geom_boxplot() +
+  theme_bw()
+```
+```{r}
+kruskal.test(avg_pi ~ pop, data = pi)
+kruskal.test(avg_pi ~ chromosome, data = pi)
+kruskal.test(avg_pi ~ subgenome, data = pi)
+```
+```{r}
+
+pi <- pi %>%
+  mutate(chr_group = gsub("S$", "", chromosome))
+
+ggplot(pi, aes(x = avg_pi, fill = subgenome)) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "identity") +
+  facet_wrap(~ chr_group, scales = "free_y") +
+  theme_bw() +
+  labs(x = expression(pi),
+       y = "Count")
+
+ggplot(pi, aes(x = avg_pi, fill = subgenome)) +
+  geom_histogram(bins = 50,
+                 alpha = 0.5,
+                 position = "identity") +
+  facet_wrap(~ chr_group, scales = "free_y") +
+  theme_bw()
+
+ggplot(pi,
+       aes(x = avg_pi,
+           color = subgenome,
+           fill = subgenome)) +
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ chr_group, scales = "free_y") +
+  theme_bw()
+
+ggplot(pi,
+       aes(x = avg_pi,
+           fill = subgenome)) +
+  geom_histogram(bins = 40,
+                 alpha = 0.6,
+                 position = "identity") +
+  facet_grid(pop ~ chr_group) +
+  theme_bw()
+
+```
+```{r}
+pi %>%
+  group_by(chr_group, subgenome) %>%
+  summarize(mean_pi = mean(avg_pi, na.rm=TRUE),
+            .groups="drop")
+
+ggplot(pi,
+       aes(subgenome,
+           avg_pi,
+           fill = subgenome)) +
+  geom_boxplot() +
+  facet_wrap(~ chr_group) +
+  theme_bw()
+```
+```{r}
+fst <- read.delim("all_pops_fst.txt")
+
+names(fst)
+head(fst)
+str(fst)
+
+summary(fst)
+
+table(fst$pop1, fst$pop2)
+
+range(fst$avg_wc_fst, na.rm=TRUE)
+```
+```{r}
+dxy <- read.delim("all_pops_dxy.txt")
+
+names(dxy)
+head(dxy)
+str(dxy)
+
+dxy_summary <- dxy %>%
+  group_by(pop1, pop2) %>%
+  summarize(
+    mean_dxy = mean(avg_dxy, na.rm = TRUE),
+    median_dxy = median(avg_dxy, na.rm = TRUE),
+    sd_dxy = sd(avg_dxy, na.rm = TRUE),
+    n_windows = n(),
+    .groups = "drop"
+  )
+
+dxy_summary
+
+chr_dxy <- dxy %>%
+  group_by(chromosome) %>%
+  summarize(
+    mean_dxy = mean(avg_dxy, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+dxy <- dxy %>%
+  mutate(
+    chr_group = gsub("S$", "", chromosome),
+    subgenome = ifelse(grepl("S$", chromosome), "S", "N")
+  )
+
+ggplot(dxy,
+       aes(x = avg_dxy,
+           fill = subgenome)) +
+  geom_histogram(
+    bins = 50,
+    alpha = 0.5,
+    position = "identity"
+  ) +
+  facet_wrap(~ chr_group, scales = "free_y") +
+  theme_bw()
+
+ggplot(dxy,
+       aes(x = avg_dxy,
+           color = subgenome,
+           fill = subgenome)) +
+  geom_density(alpha = 0.3) +
+  facet_wrap(~ chr_group, scales = "free_y") +
+  theme_bw()
+
+sub_dxy <- dxy %>%
+  group_by(pop1, pop2, subgenome) %>%
+  summarize(
+    mean_dxy = mean(avg_dxy, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+
+```
+

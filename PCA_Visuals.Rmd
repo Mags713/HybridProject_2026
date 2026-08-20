@@ -1,0 +1,350 @@
+---
+title: "SNP_Processing"
+author: "Magie Williams"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+Priror to the PCA visualization varied bash scripts were used on an HPCC cluster to process data.
+
+The PCA is from the PLINK PCA function after snps were genotyped with GATK and filtered with BCF Tools. 
+
+PCA Visualization
+```{r}
+#Defining Labels and Colors
+pop_colors <- c(
+  "Port Sheldon" = "#FE6100",
+  "Rosy Mound" = "#FFB000",
+  "Seven Bridges" = "#0057B8",
+  "Springvale" = "#DC267F",
+  "Tatum" = "#785EF0"
+)
+
+pop_labels <- c(
+  "Port Sheldon" = "Port Sheldon",
+  "Rosy Mound" = "Rosy Mound",
+  "Seven Bridges" = "Seven Bridges",
+  "Springvale" = "Springvale",
+  "Tatum" = "Tatum"
+)
+
+```
+
+
+```{r}
+#code generated with ai assistance for optimization
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+#I manually downloaded the files from the HPCC
+eVector <- read_table("BWA_Out_quick.g.vcf.gz_pca.eigenvec", col_names = FALSE)
+# Name columns: FID IID PC1..PC10
+colnames(eVector) <- c("FID","IID", paste0("PC", 1: (ncol(eVector)-2)))
+# Read eigenvalues and compute % variance
+eValues <- read_table("BWA_Out_quick.g.vcf.gz_pca.eigenval", col_names = FALSE)[[1]]
+var_pct <- 100 * eValues / sum(eValues)
+pc1_lab <- sprintf("PC1 (%.2f%%)", var_pct[1])
+pc2_lab <- sprintf("PC2 (%.2f%%)", var_pct[2])
+#population IDs Clean
+Pops <- read_csv("UpdatedSampleIDs.csv")
+eVector <- eVector %>% left_join(Pops, by = "FID")
+# Optional: join metadata (CSV with columns IID, Group, etc.)
+# meta <- read.csv("sample_metadata.csv")
+# evec <- evec %>% left_join(meta, by = "IID")
+
+gg <- ggplot(eVector, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Pop), size = 2.2) +
+  theme_bw(base_size = 12) +
+  labs(
+    title = "PCA: PC1 vs PC2",
+    x = pc1_lab,
+    y = pc2_lab,
+    color = "Population"
+  ) +
+  theme(legend.position = "right") +
+  scale_color_manual(
+    values = pop_colors,
+    labels = pop_labels,
+    name = "Population"
+  )
+print(gg)
+#ggsave("TM_PC11_PC12.png", gg, width = 6.5, height = 5.5, dpi = 300)
+
+# Add labels (optional)
+# gg + ggrepel::geom_text_repel(aes(label = IID), size = 3)
+
+```
+
+
+
+Scree Plot
+```{r}
+#code generated with ai assistance for optimization
+#need to run above chunk first
+k <- min(13, length(var_pct))
+
+scree <- data.frame(PC = factor(1:k), VarPct = var_pct[1:k])
+
+s_gg <- ggplot(scree, aes(x = PC, y = VarPct)) +
+  geom_col(fill = "#4C72B0") +
+  geom_text(aes(label = sprintf("%.1f%%", VarPct)), vjust = -0.2, size = 3) +
+  theme_bw(base_size = 12) +
+  labs(title = "PCA Scree Plot", x = "Principal component", y = "Variance explained (%)")
+print(s_gg)
+ggsave("TM_scree.png", s_gg, width = 6.5, height = 4, dpi = 300)
+
+```
+
+```{r Stats Check, message=FALSE, echo=TRUE}
+#anovas are the most appropriate so that we can do a Tukey
+#Making Anova models first
+PC1_anova <- aov(PC1 ~ Pop, data = eVector)
+PC1_check <- summary(PC1_anova)
+print(PC1_check)
+PC2_anova <- aov(PC2 ~ Pop, data = eVector)
+PC2_check <- summary(PC2_anova)
+print(PC2_check)
+#Run Tukey Test
+tukey_PC1 <- TukeyHSD(PC1_anova)
+print(tukey_PC1)
+tukey_PC2 <- TukeyHSD(PC2_anova)
+print(tukey_PC2)
+#View Tukey
+plot(tukey_PC1)
+plot(tukey_PC2)
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+var <- read.table("BWA_Out_quick.g.vcf.gz_pca.eigenvec.var", header=TRUE)
+
+var <- read.table("BWA_Out_quick.g.vcf.gz_pca.eigenvec.var", header=FALSE)
+var[, c(5,6)]   # PC1 = col 5, PC2 = col 6
+
+head(read.table("BWA_Out_quick.g.vcf.gz_pca.eigenvec.var")[,5:6])
+
+var <- read.table("BWA_Out_quick.g.vcf.gz_pca.eigenvec.var", header=TRUE)
+var[, c("PC1","PC2")]
+
+```
+
+
+
+
+
+
+Getting Pi with Pixie is next
+
+```{r}
+#need just pop sample ID . txt 
+Pop <- c(Pops[1], Pops[2])
+Pop <- as_data_frame(Pop)
+write.table(Pop, file = "PopIDs.txt", sep = "\t",
+            col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+write(unlist(Pop), "PopIDs.txt")
+```
+
+
+```{bash}
+#writing the bash script notes before putting into text edit
+#code generated with ai assistance for optimization
+#the commands
+#Define variables
+VCF=$1
+IDs=$2
+#this needed to be fixed
+BASENAME= (basename * .vcf.gz)
+NEW_VCF="${BASENAME}_read.vcf"
+#this is pi per window
+#window = 0 is whole genome
+#Easiest
+pixy --vcf "${VCF}" \
+     --populations "${IDs}" \
+     --stats pi \
+     --window-size 50000 \
+     --n_cores 8 \
+     --output_prefix pixy_overall
+
+#annotating stuff
+#genome_db??
+snpEff ann -v your_genome_db "${VCF}" > "${NEW_VCF}"
+
+#find synonmyous sites
+#this overwrites everyrun
+grep -E "synonymous_variant" "${NEW_VCF}" | \
+   awk '{print $1":"$2}' > syn_sites.txt
+
+#nonsynonmous sites
+#this overwrites everyrun
+grep -E "missense_variant|nonsense_variant" "${NEW_VCF}" | \
+   awk '{print $1":"$2}' > nonsyn_sites.txt
+
+#Now Run Pixy again
+#synonmous
+pixy --vcf "${NEW_VCF}" \
+     --populations "${IDs}" \
+     --stats pi \
+     --site-file syn_sites.txt \
+     --output_prefix pixy_syn
+#nonsynonmous
+pixy --vcf "${NEW_VCF}" \
+     --populations "${IDs}" \
+     --stats pi \
+     --site-file nonsyn_sites.txt \
+     --output_prefix pixy_nonsyn
+
+
+#I think this is how to do Hz
+vcftools --vcf "${VCF}" \
+         --het \
+         --out het_out
+
+vcftools --vcf "${VCF}" --het 
+vcftools --positions syn_sites.txt --het
+vcftools --positions nonsyn_sites.txt --het
+
+```
+
+It seems when I did Bowtie I over filtered
+
+Bowtiescript used
+
+```{bash}
+
+#!/bin/bash --login
+#SBATCH --job-name=BowtieArray
+#SBATCH --output=logs/%x_%A_%a.out
+#SBATCH --error=logs/%x_%A_%a.err
+#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=8G
+#SBATCH --array=0-12    # you will override with sbatch --array=
+
+
+#cleaned up and simpllified assistance from AI - Copilot 
+
+set -euo pipefail
+
+# ------------------------------
+# INPUT VARIABLES
+# ------------------------------
+        # directory of fastq files
+
+module purge
+module load Bowtie2 
+module load SAMtools 
+
+
+REF="$1"                        # reference fasta
+READS="${2:-./READS}"  
+BowOut="${3:-./BowtieOut}"      # output directory
+THREADS="${SLURM_CPUS_PER_TASK}"
+
+mkdir -p "$BowOut" logs
+
+# ------------------------------
+# FIND R1 AND R2 FILES
+# ------------------------------
+mapfile -t R1_FILES < <(find "$READS" -maxdepth 1 -type f \
+  \( -iname "*R1*.fastq" -o -iname "*R1*.fastq.gz" \) | sort)
+
+mapfile -t R2_FILES < <(find "$READS" -maxdepth 1 -type f \
+  \( -iname "*R2*.fastq" -o -iname "*R2*.fastq.gz" \) | sort)
+
+# ------------------------------
+# STRIP READ MARKER TO CREATE PAIRING KEYS
+# ------------------------------
+strip_read_marker() {
+  local f="$1"
+  local base
+  base="$(basename "$f")"
+  base="${base%.fastq}"
+  base="${base%.fastq.gz}"
+  base="$(echo "$base" | sed -E 's/([._-])R[12]([._-]|$)/\1SAMPLE\2/')"
+  base="$(echo "$base" | sed -E 's/([._-])001([._-]|$)/\1\2/')"
+  echo "$base"
+}
+
+# ------------------------------
+# BUILD MAPPING FOR R1 → sample key and R2 → same sample key
+# ------------------------------
+declare -A MAP_R1 MAP_R2
+
+for f in "${R1_FILES[@]}"; do
+  k="$(strip_read_marker "$f")"
+  MAP_R1["$k"]="$f"
+done
+for f in "${R2_FILES[@]}"; do
+  k="$(strip_read_marker "$f")"
+  MAP_R2["$k"]="$f"
+done
+
+# ------------------------------
+# CREATE ORDERED LIST OF PAIRED SAMPLES
+# ------------------------------
+pairs=()
+while IFS= read -r key; do
+  if [[ -n "${MAP_R1[$key]:-}" && -n "${MAP_R2[$key]:-}" ]]; then
+    pairs+=("$key")
+  fi
+done < <(printf "%s\n" "${!MAP_R1[@]}" | sort)
+
+NUM_PAIRS="${#pairs[@]}"
+
+# ------------------------------
+# SELECT SAMPLE FOR THIS ARRAY INDEX
+# ------------------------------
+IDX="${SLURM_ARRAY_TASK_ID}"
+KEY="${pairs[$IDX]}"
+R1="${MAP_R1[$KEY]}"
+R2="${MAP_R2[$KEY]}"
+SAMPLE="$(basename "$KEY" | sed -E 's/SAMPLE//g' | sed -E 's/[._-]+$//')"
+
+echo "=== Running sample $SAMPLE ==="
+echo "R1 = $R1"
+echo "R2 = $R2"
+
+
+REF_INDEX="$REF"
+
+echo "Using existing Bowtie2 index:"
+echo "  Prefix: $REF_INDEX"
+echo "  Expected files:"
+echo "    ${REF_INDEX}.1.bt2"
+echo "    ${REF_INDEX}.2.bt2"
+echo "    ${REF_INDEX}.3.bt2"
+echo "    ${REF_INDEX}.4.bt2"
+echo "    ${REF_INDEX}.rev.1.bt2"
+echo "    ${REF_INDEX}.rev.2.bt2"
+
+
+# ------------------------------
+# ALIGN + SORT BAM
+# ------------------------------
+bam_out="${BowOut}/${SAMPLE}.bam"
+
+echo "==> Aligning $SAMPLE → ${bam_out}"
+bowtie2 \
+    -p "$THREADS" \
+    -x "$REF_INDEX" \
+    -1 "$R1" \
+    -2 "$R2" \
+  | samtools view -b - \
+  | samtools sort -@ "$THREADS" -o "$bam_out"
+
+echo "==> Finished sample: $SAMPLE"
+```
+
+
+
