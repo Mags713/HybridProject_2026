@@ -16,7 +16,7 @@
 #Generated for Publication:
 
 #FIRST!!!!
-#CHANGE ARRAY TO BE 0-(1-NUMBER OF SAMPLES)
+#CHANGE ARRAY TO BE 0-(NUMBER OF SAMPLES - 1)
 
 #clearing out modules
 module purge
