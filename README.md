@@ -2,7 +2,7 @@
 ## Scripts and Documents Associated with hybrid manuscript: \
 ### Genetic Diversity
 &emsp;In order of use: \
-- BWA_2.slurm \
+- BWA_2.slurm 
 - Sorting.slurm \
 - GalwMeMaybe.slurm \
 - eiGetValues.sh \
