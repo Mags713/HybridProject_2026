@@ -6,7 +6,7 @@
 - Sorting.slurm 
 - GalwMeMaybe.slurm 
 - eiGetValues.sh 
-- PCA_Visuals.Rmd 
+- PCA_Visuals.Rmd - Currently Wrong Version as of Sep. 1, 2026 - Would technically work up if plots were pulled out but bottom is the wrong work flow
 - PiFilterNew.sh 
 - PixyPi.sh 
 - PixyPi.Rmd 
