@@ -19,6 +19,7 @@
   >- BWA_2.slurm
   >- Sorting.slurm
 >  - GalwMeMaybe.slurm
+>  - eiGetValues.sh
 
 ### <ins> Mapping </ins>
 - FinalMap.R
@@ -51,3 +52,15 @@
 >**Citation for SAMtools**\
 >-*Twelve years of SAMtools and BCFtools*\
 >-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008\
+
+<br>
+
+***eiGetValues.sh***
+>**Citation for Plink**\
+>-Package: PLINK/2.00a3.7-gfbf-2023a\
+>-Authors: Shaun Purcell, Christopher Chang\
+>-URL: www.cog-genomics.org/plink/2.0/\
+>-Lit Citation: Chang CC, Chow CC, Tellier LCAM, Vattikuti S, Purcell SM, Lee JJ (2015) Second-generation PLINK: rising to the challenge of larger and richer datasets. GigaScience, 4.\
+>**Citation for VCFtools**\
+>-Authors for OG VCFtools: Adam Auton and Anthony Marcketta\
+>-Lit Citation: The Variant Call Format and VCFtools, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011\
