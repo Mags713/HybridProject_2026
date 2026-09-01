@@ -6,6 +6,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --array=0-12 
+
 #Author: Magie Williams
 #Date of Last Author Edit: September 1st, 2026
 #AI disclosure - CoPilot through Michigan State University licensing was used for troubleshooting and syntax checking, and some organization
@@ -120,5 +121,3 @@ out_file="${BWAout}/${SAMPLE}.sam"
 
 #this is where we are finally calling BWA
 bwa/bwa mem "$REF" "$R1" "$R2" > "$out_file"
-
-bam_out="${BWAout}/${SAMPLE}.bam"
