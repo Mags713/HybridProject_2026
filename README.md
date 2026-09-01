@@ -1,6 +1,6 @@
 # HybridProject_2026 
 ## Scripts and Documents Associated with hybrid manuscript: 
-### Genetic Diversity
+### <ins> Genetic Diversity </ins>
 &emsp;In order of use: 
 - BWA_2.slurm 
 - Sorting.slurm 
@@ -19,6 +19,9 @@
   >- BWA_2.slurm
   >- Sorting.slurm
 >  - GalwMeMaybe.slurm
+
+### <ins> Mapping </ins>
+- FinalMap.R
 
 <br>
 <br>
