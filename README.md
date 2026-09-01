@@ -1,6 +1,6 @@
 # HybridProject_2026 \
-##Scripts and Documents Associated with hybrid manuscript: \
-###Genetic Diversity
+## Scripts and Documents Associated with hybrid manuscript: \
+### Genetic Diversity
 &emsp;In order of use: \
 - BWA_2.slurm \
 - Sorting.slurm \
