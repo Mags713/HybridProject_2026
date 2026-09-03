@@ -36,6 +36,7 @@
    -  BWA: https://github.com/lh3/bwa 
 
 &emsp;<ins>Usage:</ins>
+- The array number in the script header should be changed to one less the number of samples in your ReadsFolder
 - To execute the script you should use the following command and files
 
   &emsp;&emsp;sbatch BWA_2.slurm Reference.fa PathToReadsFolder NameOfOutFolder
@@ -48,7 +49,28 @@
 >-Li H. and Durbin R. (2010) Fast and accurate long-read alignment with Burrows-Wheeler transform. Bioinformatics, 26, 589-595. [PMID: 20080505]. (if you use the BWA-SW algorithm)\
 >-Li H. (2013) Aligning sequence reads, clone sequences and assembly contigs with BWA-MEM. arXiv:1303.3997v2 [q-bio.GN]. (if you use the BWA-MEM algorithm or the fastmap command, or want to cite the whole BWA package)\
 
+<br>
 
+### ***Sorting.slurm***
+&emsp;<ins>Description:</ins>
+- This script takes the sam files from *BWA_2.slurm* and generates sorted bam files.
+- It can be used on a folder of sam files as well.
+
+&emsp;<ins>Usage:</ins>
+- Before running make sure that you have the same call for samtools.
+  - If yours is different just change it in the script
+- The array number in the script header should be changed to one less the number of samples
+  - If you are using with *BWA_2.slurm* it should be equivalent to the number that you used then.
+- To run the script using the following in command line
+
+     &emsp;&emsp;sbatch BWA_2.slurm PathToBWA_2Output PathToNewOutput
+
+&emsp;<ins>Output:</ins>
+- bam files (.bam), sorted bam files (_sorted.bam, and sorted indexed bam files (_sorted.bai)
+
+>**Citation for SAMtools**\
+>-*Twelve years of SAMtools and BCFtools*\
+>-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008\
 
 <br>
 
