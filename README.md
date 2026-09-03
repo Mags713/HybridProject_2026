@@ -26,6 +26,14 @@
 
 <br>
 <br>
+### Script Descriptions and Usage
+**BWA_2.slurm**\
+Description:\
+This script uses BWA to align short read fastq files to a reference genome.\
+Usage:\
+
+<br>
+<br>
 
 ### Script Citations:
 ***BWA_2.slurm***
