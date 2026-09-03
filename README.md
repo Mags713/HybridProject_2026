@@ -105,9 +105,40 @@
 
 <br>
 
+### ADD Geno.sh
+<br>
 
+### ***eiGetValues***
+&emsp;<ins>Description:</ins>
+- It takes the VCF file and using PLINK creates PLINK files
+- Then it still with PLINK uses the PLINK files to generate a PCA
 
+&emsp;<ins>Usage:</ins>
+- Requires the VCF files from **Geno.sh** to be merged into a single file.
+- Before running check the calls module versions for PLINK and VCFtools
+- To run this script in command line:
 
+      sbatch eiGetValues.sh VCF_File.vcf
+
+&emsp;<ins>Output:</ins>
+- log file (.log)
+- eigenvector file (.eigenvec)
+- bim file (.bim)
+- var file (.var)
+- fam file (.fam)
+- bed file (.bed)
+- eigenvalue file (.eigenval)
+
+>**Citation for Plink**\
+>-Package: PLINK/2.00a3.7-gfbf-2023a\
+>-Authors: Shaun Purcell, Christopher Chang\
+>-URL: www.cog-genomics.org/plink/2.0/\
+>-Lit Citation: Chang CC, Chow CC, Tellier LCAM, Vattikuti S, Purcell SM, Lee JJ (2015) Second-generation PLINK: rising to the challenge of larger and richer datasets. GigaScience, 4.\
+>**Citation for VCFtools**\
+>-Authors for OG VCFtools: Adam Auton and Anthony Marcketta\
+>-Lit Citation: The Variant Call Format and VCFtools, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011\
+
+<br>
 
 ### Script Citations:
 ***BWA_2.slurm*** 
