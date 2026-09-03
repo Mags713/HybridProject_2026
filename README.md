@@ -39,7 +39,7 @@
 - The array number in the script header should be changed to one less the number of samples in your ReadsFolder
 - To execute the script you should use the following command and files
 
-  &emsp;&emsp;sbatch BWA_2.slurm Reference.fa PathToReadsFolder NameOfOutFolder
+      sbatch BWA_2.slurm Reference.fa PathToReadsFolder NameOfOutFolder
 
 &emsp;<ins>Output:</ins>
 - sam file per sample
@@ -63,7 +63,7 @@
   - If you are using with *BWA_2.slurm* it should be equivalent to the number that you used then.
 - To run the script using the following in command line
 
-     &emsp;&emsp;sbatch BWA_2.slurm PathToBWA_2Output PathToNewOutput
+      sbatch BWA_2.slurm PathToBWA_2Output PathToNewOutput
 
 &emsp;<ins>Output:</ins>
 - bam files (.bam), sorted bam files (_sorted.bam, and sorted indexed bam files (_sorted.bai)
