@@ -25,14 +25,31 @@
 - FinalMap.R
 
 <br>
-<br>
-### Script Descriptions and Usage
-**BWA_2.slurm**\
-Description:\
-This script uses BWA to align short read fastq files to a reference genome.\
-Usage:\
 
-<br>
+
+## Script Descriptions and Usage
+### ***BWA_2.slurm***
+
+&emsp;<ins>Description:</ins>
+- This script uses BWA to align short read fastq files to a reference genome.
+- It needs to be made executable before use. See the source github page for installation and further specific usage.
+   -  BWA: https://github.com/lh3/bwa 
+
+&emsp;<ins>Usage:</ins>
+- To execute the script you should use the following command and files
+
+  &emsp;&emsp;sbatch BWA_2.slurm Reference.fa PathToReadsFolder NameOfOutFolder
+
+&emsp;<ins>Output:</ins>
+- sam file per sample
+
+>**Citation for BWA**\
+>-Li H. and Durbin R. (2009) Fast and accurate short read alignment with Burrows-Wheeler transform. Bioinformatics, 25, 1754-1760. [PMID: 19451168]. (if you use the BWA-backtrack algorithm)\
+>-Li H. and Durbin R. (2010) Fast and accurate long-read alignment with Burrows-Wheeler transform. Bioinformatics, 26, 589-595. [PMID: 20080505]. (if you use the BWA-SW algorithm)\
+>-Li H. (2013) Aligning sequence reads, clone sequences and assembly contigs with BWA-MEM. arXiv:1303.3997v2 [q-bio.GN]. (if you use the BWA-MEM algorithm or the fastmap command, or want to cite the whole BWA package)\
+
+
+
 <br>
 
 ### Script Citations:
