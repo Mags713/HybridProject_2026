@@ -107,7 +107,6 @@
 
 <br>
 
-### ADD Geno.sh
 ### ***Geno.sh***
 &emsp;<ins>Description:</ins>
 - Takes the VCF files from *GalwMeMaybe.sh* and genotypes them into a single VCF
