@@ -4,7 +4,8 @@
 &emsp;In order of use: 
 - BWA_2.slurm 
 - Sorting.slurm 
-- GalwMeMaybe.slurm 
+- GalwMeMaybe.slurm
+- Geno.sh
 - eiGetValues.sh 
 - PCA_Visuals.Rmd - Currently Wrong Version as of Sep. 1, 2026 - Would technically work up if plots were pulled out but bottom is the wrong work flow
 - PiFilterNew.sh 
@@ -19,6 +20,7 @@
   >- BWA_2.slurm
   >- Sorting.slurm
 >  - GalwMeMaybe.slurm
+>  - Geno.sh
 >  - eiGetValues.sh
 
 ### <ins> Mapping </ins>
@@ -106,15 +108,39 @@
 <br>
 
 ### ADD Geno.sh
+### ***Geno.sh***
+&emsp;<ins>Description:</ins>
+- Takes the VCF files from *GalwMeMaybe.sh* and genotypes them into a single VCF
+
+&emsp;<ins>Usage:</ins>
+- The process takes:
+>- Folder of VCF files + File of Sample x Population -> Genotyped VCF files for PCA
+- You should also check the calls and versions for required modules (SamTools and GATK, I used GATK ver. 4.5.0.0-GCCcore-12.3.0-Java-17)
+- To run the script put the following into commmand line:
+  
+      sbatch Geno.sh Reference.fa PathToNewSortedBAM_Folder GenotypeMap.txt  
+
+&emsp;<ins>Output:</ins>
+- Single Genotyped VCF File (.vcf)
+- Genomic Database Files (.tbi, .bed, etc.)
+
+>**Citation for GATK**\
+>-Van der Auwera GA & O'Connor BD. (2020). Genomics in the Cloud: Using Docker, GATK, and WDL in Terra (1st Edition). O'Reilly Media.\
+>**Citation for GATK best practices**\
+>-Van der Auwera GA, Carneiro M, Hartl C, Poplin R, del Angel G, Levy-Moonshine A, Jordan T, Shakir K, Roazen D, Thibault J, Banks E, Garimella K, Altshuler D, Gabriel S, DePristo M. (2013). From FastQ Data to High-Confidence Variant Calls: The Genome Analysis Toolkit Best Practices Pipeline. Curr Protoc Bioinformatics, 43:11.10.1-11.10.33. DOI: 10.1002/0471250953.bi1110s43.\
+>**Citation for SAMtools**\
+>-*Twelve years of SAMtools and BCFtools*\
+>-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008\
+
 <br>
 
-### ***eiGetValues***
+### ***eiGetValues.sh***
 &emsp;<ins>Description:</ins>
 - It takes the VCF file and using PLINK creates PLINK files
 - Then it still with PLINK uses the PLINK files to generate a PCA
 
 &emsp;<ins>Usage:</ins>
-- Requires the VCF files from **Geno.sh** to be merged into a single file.
+- Requires the VCF files from *Geno.sh* to be merged into a single file.
 - Before running check the calls module versions for PLINK and VCFtools
 - To run this script in command line:
 
@@ -157,6 +183,17 @@
 <br>
 
 ***GalwMeMaybe.slurm***
+>**Citation for GATK**\
+>-Van der Auwera GA & O'Connor BD. (2020). Genomics in the Cloud: Using Docker, GATK, and WDL in Terra (1st Edition). O'Reilly Media.\
+>**Citation for GATK best practices**\
+>-Van der Auwera GA, Carneiro M, Hartl C, Poplin R, del Angel G, Levy-Moonshine A, Jordan T, Shakir K, Roazen D, Thibault J, Banks E, Garimella K, Altshuler D, Gabriel S, DePristo M. (2013). From FastQ Data to High-Confidence Variant Calls: The Genome Analysis Toolkit Best Practices Pipeline. Curr Protoc Bioinformatics, 43:11.10.1-11.10.33. DOI: 10.1002/0471250953.bi1110s43.\
+>**Citation for SAMtools**\
+>-*Twelve years of SAMtools and BCFtools*\
+>-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008\
+
+<br>
+
+***Geno.sh***
 >**Citation for GATK**\
 >-Van der Auwera GA & O'Connor BD. (2020). Genomics in the Cloud: Using Docker, GATK, and WDL in Terra (1st Edition). O'Reilly Media.\
 >**Citation for GATK best practices**\
