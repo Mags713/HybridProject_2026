@@ -16,7 +16,6 @@
 >&emsp;In order of use:
 - PiFilterNew.sh 
 - PixyPi.sh 
-- PixyPi.Rmd 
 - PixyResults.Rmd 
 
 <br>
