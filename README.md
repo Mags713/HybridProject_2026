@@ -7,7 +7,7 @@
 - GalwMeMaybe.slurm
 - Geno.sh
 - eiGetValues.sh 
-- PCA_Visuals.Rmd - Currently Wrong Version as of Sep. 1, 2026 - Would technically work up if plots were pulled out but bottom is the wrong work flow
+- FinalPCA_Plots.Rmd
 - PiFilterNew.sh 
 - PixyPi.sh 
 - PixyPi.Rmd 
