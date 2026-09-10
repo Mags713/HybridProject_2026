@@ -29,6 +29,8 @@
 >  - Geno.sh
 >  - eiGetValues.sh
 >  - FinalPCA_Plots.Rmd
+>  - PiFilterNew.sh
+>  - PixyPi.sh
 
 ### <ins> Mapping </ins>
 - FinalMap.R
