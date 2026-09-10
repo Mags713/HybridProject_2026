@@ -1,0 +1,13 @@
+RM1     BWA_Out/SampleVCFs/RM1.g.vcf.gz
+RM4     BWA_Out/SampleVCFs/RM4.g.vcf.gz
+RM3     BWA_Out/SampleVCFs/RM3.g.vcf.gz
+Sv2     BWA_Out/SampleVCFs/Sv2.g.vcf.gz
+Tatum   BWA_Out/SampleVCFs/Tatum.g.vcf.gz
+Sv1     BWA_Out/SampleVCFs/Sv1.g.vcf.gz
+SV3B    BWA_Out/SampleVCFs/SV3B.g.vcf.gz
+RM2     BWA_Out/SampleVCFs/RM2.g.vcf.gz
+PS2     BWA_Out/SampleVCFs/PS2.g.vcf.gz
+PS1     BWA_Out/SampleVCFs/PS1.g.vcf.gz
+PS6     BWA_Out/SampleVCFs/PS6.g.vcf.gz
+Seven6  BWA_Out/SampleVCFs/Seven6.g.vcf.gz
+Sb1     BWA_Out/SampleVCFs/Sb1.g.vcf.gz
