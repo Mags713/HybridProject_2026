@@ -35,7 +35,7 @@ DIR_NAME="$(basename "$VCF_DIR")"
 FINAL_GIRL="${VCF_DIR}/${DIR_NAME}_quick.g.vcf.gz"
 #defining intervals for future use
 INTERVALS="intervals_${DIR_NAME}_quick.list"
-#sample + population map
+#sample locations hard in - this was needed to fix some running errors
 MAP=$3
 #Name and create the genomic database
 GnDB="genomicsdb_${DIR_NAME}_quick"
