@@ -1,13 +1,19 @@
 # HybridProject_2026 
 ## Scripts and Documents Associated with hybrid manuscript: 
 ### <ins> Genetic Diversity </ins>
-&emsp;In order of use: 
+
+&emsp;**SNP calling**
+>&emsp;In order of use: 
 - BWA_2.slurm 
 - Sorting.slurm 
 - GalwMeMaybe.slurm
 - Geno.sh
 - eiGetValues.sh 
-- FinalPCA_Plots.Rmd
+- FinalPCA_Plots.Rmd\
+
+
+&emsp;**Nucleotide Diversity**
+>&emsp;In order of use:
 - PiFilterNew.sh 
 - PixyPi.sh 
 - PixyPi.Rmd 
@@ -22,6 +28,7 @@
 >  - GalwMeMaybe.slurm
 >  - Geno.sh
 >  - eiGetValues.sh
+>  - FinalPCA_Plots.Rmd
 
 ### <ins> Mapping </ins>
 - FinalMap.R
@@ -163,6 +170,26 @@
 >-Authors for OG VCFtools: Adam Auton and Anthony Marcketta\
 >-Lit Citation: The Variant Call Format and VCFtools, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011\
 
+### ***FinalPCA_Plots.Rmd***
+&emsp;<ins>Description:</ins>
+- Using outputs from *eiGetValues.sh* generate plots and analyze PCA results
+
+&emsp;<ins>Usage:</ins>
+- Requires: .eigenvec file, .eigenval file, .csv of sample and population IDs
+- Recommended usage in Rstudio
+
+&emsp;<ins>Output:</ins>
+- PCA plot
+- Scree plot
+- Basic Stats (ANOVA, Tukey)
+
+>**Citation for readr package**\
+>-Wickham H, Hester J, Bryan J (2026). readr: Read Rectangular Text Data. R package version 2.2.0, https://readr.tidyverse.org \
+>**Citation for dpylr package**\
+>-Wickham H, François R, Henry L, Müller K, Vaughan D (2026). dplyr: A Grammar of Data Manipulation. R package version 1.2.1, https://dplyr.tidyverse.org \
+>**Citation for ggplot2 package**\
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+
 <br>
 
 ### Script Citations:
@@ -212,3 +239,13 @@
 >**Citation for VCFtools**\
 >-Authors for OG VCFtools: Adam Auton and Anthony Marcketta\
 >-Lit Citation: The Variant Call Format and VCFtools, Petr Danecek, Adam Auton, Goncalo Abecasis, Cornelis A. Albers, Eric Banks, Mark A. DePristo, Robert Handsaker, Gerton Lunter, Gabor Marth, Stephen T. Sherry, Gilean McVean, Richard Durbin and 1000 Genomes Project Analysis Group, Bioinformatics, 2011\
+
+<br>
+
+***FinalPCA_Plots.Rmd***
+>**Citation for *readr* package**\
+>-Wickham H, Hester J, Bryan J (2026). readr: Read Rectangular Text Data. R package version 2.2.0, https://readr.tidyverse.org. \
+>**Citation for *dpylr* package**\
+>-Wickham H, François R, Henry L, Müller K, Vaughan D (2026). dplyr: A Grammar of Data Manipulation. R package version 1.2.1, https://dplyr.tidyverse.org. \
+>**Citation for *ggplot2* package**\
+H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.\
