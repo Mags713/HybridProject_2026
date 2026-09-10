@@ -1,0 +1,116 @@
+---
+title: "eiGetValues_Visualizer"
+author: "Magie Williams"
+date: "`r Sys.Date()`"
+output: html_document
+---
+Priror to the PCA visualization varied bash scripts were used on an HPCC cluster to process data.
+
+The PCA is from the PLINK PCA function after snps were genotyped with GATK and filtered with BCF Tools. 
+
+**PCA Visualization**
+```{r Defining Labels and Colors, echo=FALSE}
+#Defining Labels and Colors
+pop_colors <- c(
+  "Port Sheldon" = "#FE6100",
+  "Rosy Mound" = "#FFB000",
+  "Seven Bridges" = "#0057B8",
+  "Springvale" = "#DC267F",
+  "Tatum" = "#785EF0"
+)
+
+pop_labels <- c(
+  "Port Sheldon" = "Port Sheldon",
+  "Rosy Mound" = "Rosy Mound",
+  "Seven Bridges" = "Seven Bridges",
+  "Springvale" = "Springvale",
+  "Tatum" = "Tatum"
+)
+
+```
+
+```{r Package Library}
+#install if needed
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r Fixing Data, message=FALSE, warning=FALSE}
+#I manually downloaded the files from the HPCC
+eVector <- read_table("BWA_Out_quick.g.vcf.gz_pca.eigenvec", col_names = FALSE)
+# Name columns: FID IID PC1..PC10
+colnames(eVector) <- c("FID","IID", paste0("PC", 1: (ncol(eVector)-2)))
+# Read eigenvalues and compute % variance
+eValues <- read_table("BWA_Out_quick.g.vcf.gz_pca.eigenval", col_names = FALSE)[[1]]
+var_pct <- 100 * eValues / sum(eValues)
+pc1_lab <- sprintf("PC1 (%.2f%%)", var_pct[1])
+pc2_lab <- sprintf("PC2 (%.2f%%)", var_pct[2])
+#population IDs Clean
+Pops <- read_csv("UpdatedSampleIDs.csv")
+eVector <- eVector %>% left_join(Pops, by = "FID")
+```
+
+
+```{r First Plot, warning=FALSE}
+gg <- ggplot(eVector, aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = Pop), size = 2.2) +
+  theme_bw(base_size = 12) +
+  labs(
+    title = "PCA: PC1 vs PC2",
+    x = pc1_lab,
+    y = pc2_lab,
+    color = "Population"
+  ) +
+  theme(legend.position = "right") +
+  scale_color_manual(
+    values = pop_colors,
+    labels = pop_labels,
+    name = "Population"
+  )
+print(gg)
+#ggsave("TM_PC11_PC12.png", gg, width = 6.5, height = 5.5, dpi = 300)
+
+# Add labels (optional)
+# gg + ggrepel::geom_text_repel(aes(label = IID), size = 3)
+```
+While we may have the first plot, I like to double check my data distributions to make sure everything is looking okay, or if there is something I should flag. 
+
+```{r Scree Plot, warning=FALSE}
+#code generated with ai assistance for optimization
+#need to run above chunk first
+k <- min(13, length(var_pct))
+
+scree <- data.frame(PC = factor(1:k), VarPct = var_pct[1:k])
+
+s_gg <- ggplot(scree, aes(x = PC, y = VarPct)) +
+  geom_col(fill = "#4C72B0") +
+  geom_text(aes(label = sprintf("%.1f%%", VarPct)), vjust = -0.2, size = 3) +
+  theme_bw(base_size = 12) +
+  labs(title = "PCA Scree Plot", x = "Principal component", y = "Variance explained (%)")
+print(s_gg)
+#ggsave("TM_scree.png", s_gg, width = 6.5, height = 4, dpi = 300)
+
+```
+If everything looks good with the disctribution I shouldn't need much more plotting than the scree so I move onto prelime stats
+
+```{r Stats Check, message=FALSE, echo=TRUE}
+#anovas are the most appropriate so that we can do a Tukey
+#Making Anova models first
+PC1_anova <- aov(PC1 ~ Pop, data = eVector)
+PC1_check <- summary(PC1_anova)
+print(PC1_check)
+PC2_anova <- aov(PC2 ~ Pop, data = eVector)
+PC2_check <- summary(PC2_anova)
+print(PC2_check)
+#Run Tukey Test
+tukey_PC1 <- TukeyHSD(PC1_anova)
+print(tukey_PC1)
+tukey_PC2 <- TukeyHSD(PC2_anova)
+print(tukey_PC2)
+#View Tukey
+plot(tukey_PC1)
+plot(tukey_PC2)
+```
+
+
