@@ -229,13 +229,34 @@ H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New Yor
       sbatch PixyPi.sh
 
 &emsp;<ins>Output:</ins>
-- File with pi results (.pi)
+- File with pi results (pi.txt)
 - File with FST results (.fst)
 - Nucleotide Differences (.dxy)
   - with this specific group of 2+ this isn't quite right, but I like having it.
 
 >**Citation for pixy**\
 >-Korunes, K.L. and Samuk, K. (2021), pixy: Unbiased estimation of nucleotide diversity and divergence in the presence of missing data. Molecular Ecology Resources. Accepted Author Manuscript. https://doi.org/10.1111/1755-0998.13326
+
+<br>
+
+### ***PixyResults.Rmd***
+&emsp;<ins>Description:</ins>
+- Using R takes the results from *PixyPi.sh* analyzes with some stats and makes plots
+
+&emsp;<ins>Usage:</ins>
+- Recommended usage in Rstudio and to run chunk by chunk
+- Requires the .txt file output
+
+&emsp;<ins>Output:</ins>
+- Various plot types
+- Stats by various combinations between populations and chromosomes
+
+>***Citation for tidyverse package***\
+>-Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T., Miller, E., Bache, S., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686.\
+>***Citation for Broom package***\
+>-Robinson D, Hayes A, Couch S, Hvitfeldt E (2026). broom: Convert Statistical Objects into Tidy Tibbles. R package version 1.0.13, https://broom.tidymodels.org/. \
+>***Citation for ggplot2 package***\
+>-H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
 
 <br>
 
@@ -308,3 +329,13 @@ H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New Yor
 ***PixyPi.sh***
 >**Citation for pixy**\
 >-Korunes, K.L. and Samuk, K. (2021), pixy: Unbiased estimation of nucleotide diversity and divergence in the presence of missing data. Molecular Ecology Resources. Accepted Author Manuscript. https://doi.org/10.1111/1755-0998.13326
+
+<br>
+
+***PixyResults.Rmd***
+>**Citation for *tidyverse* r package**\
+>-Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T., Miller, E., Bache, S., Müller, K., Ooms, J., Robinson, D., Seidel, D., Spinu, V., … Yutani, H. (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686. \
+>**Citation for *Broom* r package**\
+>-Robinson D, Hayes A, Couch S, Hvitfeldt E (2026). broom: Convert Statistical Objects into Tidy Tibbles. R package version 1.0.13, https://broom.tidymodels.org/. \
+>**Citation for *ggplot2* r package**\
+>-H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
