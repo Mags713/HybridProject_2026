@@ -215,7 +215,25 @@ H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New Yor
 <br>
 
 ### ***PixyPi.sh***
-NEED TO FINISH
+&emsp;<ins>Description:</ins>
+- Take the filtered VCF from *PiFilterNew.sh* and process it with pixy for nucleotide diversity assessments
+
+&emsp;<ins>Usage:</ins>
+- Besides the final VCF a map of Sample IDs + populations is needed
+- To use run in command line:
+
+      sbatch PixyPi.sh
+
+&emsp;<ins>Output:</ins>
+- File with pi results (.pi)
+- File with FST results (.fst)
+- Nucleotide Differences (.dxy)
+  - with this specific group of 2+ this isn't quite right, but I like having it.
+
+>**Citation for pixy**\
+>-Korunes, K.L. and Samuk, K. (2021), pixy: Unbiased estimation of nucleotide diversity and divergence in the presence of missing data. Molecular Ecology Resources. Accepted Author Manuscript. https://doi.org/10.1111/1755-0998.13326
+
+<br>
 
 ### Script Citations:
 ***BWA_2.slurm*** 
@@ -274,3 +292,15 @@ NEED TO FINISH
 >-Wickham H, François R, Henry L, Müller K, Vaughan D (2026). dplyr: A Grammar of Data Manipulation. R package version 1.2.1, https://dplyr.tidyverse.org. \
 >**Citation for *ggplot2* package**\
 H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.\
+
+<br>
+
+***PiFilterNew.sh***
+>**Citation for BCFtools**\
+>-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008
+
+<br>
+
+***PixyPi.sh***
+>**Citation for pixy**\
+>-Korunes, K.L. and Samuk, K. (2021), pixy: Unbiased estimation of nucleotide diversity and divergence in the presence of missing data. Molecular Ecology Resources. Accepted Author Manuscript. https://doi.org/10.1111/1755-0998.13326
