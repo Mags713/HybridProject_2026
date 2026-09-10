@@ -122,7 +122,8 @@
 
 &emsp;<ins>Usage:</ins>
 - The process takes:
->- Folder of VCF files + File of Sample x Population -> Genotyped VCF files for PCA
+  - > Folder of VCF files + File of Sample x File Location -> Genotyped VCF files for PCA
+   - For example of sample list needed see: *SampleList.txt*
 - You should also check the calls and versions for required modules (SamTools and GATK, I used GATK ver. 4.5.0.0-GCCcore-12.3.0-Java-17)
 - To run the script put the following into commmand line:
   
@@ -178,6 +179,7 @@
 
 &emsp;<ins>Usage:</ins>
 - Requires: .eigenvec file, .eigenval file, .csv of sample and population IDs
+    - To see example of Sample + Population IDs *UpdatedSampleIDs.csv*
 - Recommended usage in Rstudio
 
 &emsp;<ins>Output:</ins>
@@ -222,6 +224,7 @@ H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New Yor
 
 &emsp;<ins>Usage:</ins>
 - Besides the final VCF a map of Sample IDs + populations is needed
+    - See format for Sample ID text file: *sample_IDs.txt*
 - To use run in command line:
 
       sbatch PixyPi.sh
