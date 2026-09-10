@@ -192,6 +192,31 @@ H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New Yor
 
 <br>
 
+### ***PiFilterNew.sh***
+&emsp;<ins>Description:</ins>
+- Combines and Filters sample VCF files so that they can be processed for Pi or nucleotide diversity with pixy
+
+&emsp;<ins>Usage:</ins>
+- Requires folder of vcf files with the designation in the script
+  - >   "BWA_Out_*.vcf.gz"
+  > if yours is different you will need to change
+- The preset for the script is to confirm and keep invariant sites, filter low depth reads ie. those with a depth < 3, and keeps sites with less < 10% missing reads
+- Run in command line with:
+
+      sbatch PiFilterNew.sh
+
+&emsp;<ins>Output:</ins>
+- filtered VCF files
+     - intermediate files are kept
+
+>**Citation for BCFtools**\
+>-Petr Danecek, James K Bonfield, Jennifer Liddle, John Marshall, Valeriu Ohan, Martin O Pollard, Andrew Whitwham, Thomas Keane, Shane A McCarthy, Robert M Davies, Heng Li. GigaScience, Volume 10, Issue 2, February 2021, giab008, https://doi.org/10.1093/gigascience/giab008
+
+<br>
+
+### ***PixyPi.sh***
+NEED TO FINISH
+
 ### Script Citations:
 ***BWA_2.slurm*** 
 >**Citation for BWA**\
