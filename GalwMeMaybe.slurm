@@ -33,7 +33,7 @@ module load SAMtools
 #The Contact List - Data input
 #The reference you aligned to
 #you can either call it in the command line or change the file name what I have is calling the reference inside another directory
-REF_FASTA="${1:-./Bmac_DB/BMac_assembly-v2.fa}"
+REF_FASTA="${1:-./N_Kept_DB/B_Mac_np2.fa}"
 #Define the directory the folder of the converted bam files is in
 BAM_DIR="${2:-./BWA_Out}"
 
