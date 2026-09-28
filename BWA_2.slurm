@@ -54,7 +54,7 @@ READS="${2:-./READS}"
 #You can call this in the command line or change /BWA_TM_Out to your desired outfolder name
 #I suggest using BWA to denote what was used then something to indicate it is an outfolder and what reference you used
 BWAout="${3:-./BWA_TM_Out}" 
-mkdir -p BWAout
+mkdir -p "$BWAout"
 
 #FIND R1 AND R2 FILES
 #When we get our files back from RTSF they are given in the format SampleName_R1.fastq.gz with a sister file replacing R1 with R2
