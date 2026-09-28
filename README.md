@@ -47,6 +47,10 @@
 
 &emsp;<ins>Usage:</ins>
 - The array number in the script header should be changed to one less the number of samples in your ReadsFolder
+- The reference also needs to be indexed
+
+      bwa/bwa index Reference.fa
+  
 - To execute the script you should use the following command and files
 
       sbatch BWA_2.slurm Reference.fa PathToReadsFolder NameOfBWAOutFolder
