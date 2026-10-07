@@ -101,6 +101,10 @@
     - if running with *BWA_2.slum* or *Sorting.slurm* it should be the same number that you used for those
 - You should also check the calls and versions for required modules (SamTools and GATK, I used GATK ver. 4.5.0.0-GCCcore-12.3.0-Java-17)
 - You also need to have a .fai of the reference which can be made with SamTools faidx command
+- You also need to have .dict files for GATK so run the following in command line after loading GATK:
+
+      gatk CreateSequenceDictionary -R reference.fa -O reference.dict
+      
 - To run the script put the following into commmand line:
 
       sbatch GalwMeMaybe.slurm Rerference.fa PathToNewSortedBAM_Folder
